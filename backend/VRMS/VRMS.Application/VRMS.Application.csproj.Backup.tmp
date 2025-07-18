@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+<ItemGroup>
+    <ProjectReference Include="..\VRMS.Domain\VRMS.Domain.csproj" />
+    <ProjectReference Include="..\VRMS.Infrastructure\VRMS.Infrastructure.csproj" />
+</ItemGroup>
+<ItemGroup>
+  <PackageReference Include="AutoMapper" Version="14.0.0" />
+  <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+</ItemGroup>
+
+</Project>
