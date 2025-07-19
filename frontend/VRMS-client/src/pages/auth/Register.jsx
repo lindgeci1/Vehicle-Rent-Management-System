@@ -21,6 +21,7 @@ export function Register() {
   const [error, setError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 const [success, setSuccess] = useState('');
   const handleRegister = async () => {
     setIsRegistering(true);
@@ -88,15 +89,30 @@ const [success, setSuccess] = useState('');
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <MDBInput
-                wrapperClass="mb-4"
-                label="Password"
-                id="password"
-                type="password"
-                size="lg"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="mb-4 position-relative">
+                <MDBInput
+                  label="Password"
+                  id="form2"
+                  type={showPassword ? 'text' : 'password'}
+                  size="lg"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '15px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#6c757d'
+                  }}
+                >
+                  <MDBIcon icon={showPassword ? 'eye-slash' : 'eye'} />
+                </span>
+              </div>
+
 {/* 
               <div className="d-flex justify-content-between mb-4">
                 <MDBCheckbox name="flexCheck" id="flexCheckDefault" label="Remember me" />

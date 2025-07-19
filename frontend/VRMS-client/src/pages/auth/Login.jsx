@@ -20,7 +20,7 @@ export function Login() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
 const handleLogin = async () => {
   setError('');
   setIsLoggingIn(true);
@@ -87,15 +87,30 @@ const handleLogin = async () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <MDBInput
-                wrapperClass="mb-4"
-                label="Password"
-                id="form2"
-                type="password"
-                size="lg"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="mb-4 position-relative">
+                <MDBInput
+                  label="Password"
+                  id="form2"
+                  type={showPassword ? 'text' : 'password'}
+                  size="lg"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '15px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#6c757d'
+                  }}
+                >
+                  <MDBIcon icon={showPassword ? 'eye-slash' : 'eye'} />
+                </span>
+              </div>
+
 
             <div className="d-flex justify-content-between mb-4">
               {/* <MDBCheckbox name="flexCheck" id="flexCheckDefault" label="Remember me" /> */}
