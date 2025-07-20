@@ -38,7 +38,7 @@ const handleLogin = async () => {
       Cookies.set('token', token); // Only store the access token
        Cookies.set('refreshExpiresAt', new Date(refreshTokenExpiryTime).getTime());
       await new Promise(resolve => setTimeout(resolve, 1000));
-      navigate('/dashboard/profile');
+      navigate('/dashboard/home');
       window.location.reload();
     } else {
       setError('Login failed: Token not returned');

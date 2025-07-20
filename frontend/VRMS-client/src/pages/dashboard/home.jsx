@@ -6,20 +6,36 @@ import ReservationStatusBarChart from "../../StatCharts/ReservationStatusBarChar
 import VehicleUtilizationCalendar from "../../StatCharts/CalendarChartWidget";
 import AdvancedReservationCalendar from "../../StatCharts/NewChartComponent";
 import CountCustomerView from "../../StatCharts/CountCustomerView";
+import ReservationStatusChart from "../../StatCharts/ReservationStatusChart";
+import VehicleUsageChart from "../../StatCharts/VehicleUsageChart";
+import CustomerProfileCard from "../../StatCharts/ProfileWelcomeCard";
+
+
 import Cookies from "js-cookie";
 import { decodeToken } from "../../../decodeToken"; 
 
 export function Home() {
   const token = Cookies.get("token");
   const role = decodeToken(token)?.role;
+  const userId = decodeToken(token)?.userId;
 
 return (
   <div className="mt-8 px-6">
     {role === "Customer" ? (
 
+    <div className="space-y-8">
+     <div>
+      <CustomerProfileCard />
+    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ReservationStatusChart userId={userId} />
+        <VehicleUsageChart userId={userId} />
+      </div>
+
       <div>
         <CountCustomerView />
       </div>
+    </div>
     ) : (
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
