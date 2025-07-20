@@ -3,11 +3,13 @@ import dayjs from "dayjs";
 import { Card, Typography, Tooltip } from "@material-tailwind/react";
 import { api } from "@/apiClient";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+
 function AdvancedReservationCalendar({ height = 600 }) {
   const [reservations, setReservations] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(dayjs().startOf("month"));
+  const [filterStatus, setFilterStatus] = useState(1); // Default: show Reserved
 
   // Palette for reservation backgrounds
   const colors = [
@@ -57,13 +59,12 @@ const getCalendarDays = () => {
   return days;
 };
 
-
 const getReservationsForDay = (day) =>
   reservations.filter((res) => {
-    if (res.status !== 1) return false; // Only include status === 1
+    if (res.status !== filterStatus) return false;
     const start = dayjs(res.startDate);
     const end = dayjs(res.endDate);
-    return day.isBetween(start, end, "day", "[]"); // Exact inclusive match
+    return day.isBetween(start, end, "day", "[]"); // inclusive match
   });
 
 
@@ -99,6 +100,32 @@ const getReservationsForDay = (day) =>
     <FiChevronRight size={20} />
   </button>
 </div>
+
+<div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+  <div className="flex gap-3">
+    <button
+      className={`px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all duration-200 ${
+        filterStatus === 1
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+      }`}
+      onClick={() => setFilterStatus(1)}
+    >
+      Reserved
+    </button>
+    <button
+      className={`px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all duration-200 ${
+        filterStatus === 0
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+      }`}
+      onClick={() => setFilterStatus(0)}
+    >
+      Pending
+    </button>
+  </div>
+</div>
+
 
 
       {/* Weekday headers */}
