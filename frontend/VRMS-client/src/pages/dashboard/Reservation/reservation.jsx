@@ -398,7 +398,7 @@ return (
     <ConfirmDialog
       open={showDeleteDialog}
       title="Confirm Deletion"
-      content="Are you sure you want to delete this reservation?"
+      content="Are you sure you want to cancel this reservation?"
       onClose={() => setShowDeleteDialog(false)}
       onConfirm={handleDelete}
     />
