@@ -311,8 +311,8 @@ const handleVehicleClick = async (id) => {
   />
 )}
 
-{category === 'Bus' && (
-  <BusDialog
+{category === 'Motorcycle' && (
+  <MotorcycleDialog
     open={showVehicleDialog}
     onClose={() => setShowVehicleDialog(false)}
     vehicle={selectedVehicle}

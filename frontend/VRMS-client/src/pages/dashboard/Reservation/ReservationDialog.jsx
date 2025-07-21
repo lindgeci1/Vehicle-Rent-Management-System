@@ -8,23 +8,21 @@ import {
   Divider,
   Grid,
   CardMedia,
-  Stack
+  Stack,
 } from '@mui/material';
 import {
   DirectionsCar,
   LocalGasStation,
   EventSeat,
-  CheckCircle,
-  Cancel,
-  SyncAlt
+  SyncAlt,
+  StarRate,
 } from '@mui/icons-material';
 import { api } from '@/apiClient';
 
 const ReservationDialog = ({ open, onClose, reservationId }) => {
   const [vehicle, setVehicle] = useState(null);
   const [reservation, setReservation] = useState(null);
-  const [photoIndex, setPhotoIndex] = useState(0);
-const [history, setHistory] = useState(null);
+  const [history, setHistory] = useState(null);
 
   useEffect(() => {
     if (!reservationId || !open) return;
@@ -47,42 +45,40 @@ const [history, setHistory] = useState(null);
     fetchData();
   }, [reservationId, open]);
 
-  useEffect(() => {
-    if (vehicle?.photos?.length > 1) {
-      const interval = setInterval(() => {
-        setPhotoIndex((prev) => (prev + 1) % vehicle.photos.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [vehicle]);
-
-  const formatDate = (date) =>
-    date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
-
-  const currentPhoto = vehicle?.photos?.[photoIndex];
+  const currentPhoto = vehicle?.photos?.[0];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 600, fontSize: '1.25rem' }}>
-        <DirectionsCar sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Reservation Overview
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle
+        sx={{
+          fontWeight: 600,
+          fontSize: '1.1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          pb: 1,
+        }}
+      >
+        <DirectionsCar fontSize="small" />
+        Vehicle Overview
       </DialogTitle>
 
-      <DialogContent dividers>
-        {vehicle && reservation ? (
+      <DialogContent dividers sx={{ p: 2 }}>
+        {vehicle ? (
           <>
             {/* Image */}
             <Box
               sx={{
                 width: '100%',
-                height: 300,
-                borderRadius: 2,
-                backgroundColor: '#f0f0f0',
-                mb: 3,
+                height: 180,
+                borderRadius: 1.5,
+                backgroundColor: 'background.default',
+                mb: 2,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
+                boxShadow: 1,
               }}
             >
               {currentPhoto ? (
@@ -93,89 +89,115 @@ const [history, setHistory] = useState(null);
                   sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <Typography variant="body2" color="text.secondary">No Image Available</Typography>
+                <Typography variant="body2" color="text.disabled">
+                  No Image Available
+                </Typography>
               )}
             </Box>
-{history && (
-  <Box
-    sx={{
-      backgroundColor: '#f9f9f9',
-      p: 2,
-      borderRadius: 2,
-      mb: 3,
-      border: '1px solid #e0e0e0',
-    }}
-  >
-    <Typography variant="h6" fontWeight={600} gutterBottom>
-      Vehicle History
-    </Typography>
-    <Divider sx={{ mb: 2 }} />
-    <Stack spacing={1.5}>
-      <DetailRow label="Total KM" value={`${history.km.toFixed(2)} km`} />
-      <DetailRow label="Number of Drivers" value={history.numberOfDrivers} />
-      <DetailRow label="Had Accident" value={history.hasHadAccident ? 'Yes' : 'No'} />
-      {history.hasHadAccident && (
-        <DetailRow label="Accident Description" value={history.accidentDescription} />
-      )}
-    </Stack>
-  </Box>
-)}
 
-
-            {/* Vehicle Details */}
 <Box
   sx={{
-    backgroundColor: '#f9f9f9',
-    p: 2,
-    borderRadius: 2,
-    mb: 3,
-    border: '1px solid #e0e0e0',
+    backgroundColor: 'background.paper',
+    p: 1.5,
+    borderRadius: 1.5,
+    mb: 2,
+    border: '1px solid',
+    borderColor: 'divider',
   }}
 >
-  <Typography variant="h6" fontWeight={600} gutterBottom>
+  <Typography variant="subtitle1" fontWeight={600} mb={1}>
     Vehicle Information
   </Typography>
-  <Divider sx={{ mb: 2 }} />
-  <Grid container spacing={2}>
-    <Info label="Mark" value={vehicle.mark} />
-    <Info label="Model" value={vehicle.model} />
-    <Info label="Year" value={vehicle.year} />
-    <Info label="Fuel Type" value={vehicle.fuelType} icon={<LocalGasStation fontSize="small" />} />
-    <Info label="Seats" value={vehicle.seatingCapacity} icon={<EventSeat fontSize="small" />} />
-    <Info icon={<SyncAlt fontSize="small" />} label="Transmission" value={vehicle.transmission || 'N/A'} />
+  <Grid container spacing={1.5}>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Mark:</Typography>
+      <Typography variant="body2" color="text.secondary">{vehicle.mark}</Typography>
+    </Grid>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Model:</Typography>
+      <Typography variant="body2" color="text.secondary">{vehicle.model}</Typography>
+    </Grid>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Year:</Typography>
+      <Typography variant="body2" color="text.secondary">{vehicle.year}</Typography>
+    </Grid>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Fuel Type:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <LocalGasStation fontSize="small" />
+        <Typography variant="body2" color="text.secondary">{vehicle.fuelType}</Typography>
+      </Box>
+    </Grid>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Seats:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <EventSeat fontSize="small" />
+        <Typography variant="body2" color="text.secondary">{vehicle.seatingCapacity}</Typography>
+      </Box>
+    </Grid>
+    <Grid item xs={6}>
+      <Typography variant="body2" fontWeight={600}>Transmission:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <SyncAlt fontSize="small" />
+        <Typography variant="body2" color="text.secondary">{vehicle.transmission || 'N/A'}</Typography>
+      </Box>
+    </Grid>
   </Grid>
 </Box>
 
 
-            <Divider sx={{ my: 2 }} />
 
-            {/* Reservation Details */}
-<Box
-  sx={{
-    backgroundColor: '#f9f9f9',
-    p: 2,
-    borderRadius: 2,
-    mb: 2,
-    border: '1px solid #e0e0e0',
-  }}
->
-  <Typography variant="h6" fontWeight={600} gutterBottom>
-    Reservation Details
-  </Typography>
-  <Divider sx={{ mb: 2 }} />
-  <Stack spacing={1.5}>
-    <DetailRow label="Start Date" value={formatDate(reservation.startDate)} />
-    <DetailRow label="End Date" value={formatDate(reservation.endDate)} />
-    <DetailRow
-      label="Status"
-      value={reservation.status === 0 ? 'Pending' : 'Reserved'}
-    />
-  </Stack>
-</Box>
+{history && (
+  <Box
+    sx={{
+      backgroundColor: 'background.paper',
+      p: 1.5,
+      borderRadius: 1.5,
+      border: '1px solid',
+      borderColor: 'divider',
+      mb: 2,
+    }}
+  >
+    <Typography variant="subtitle1" fontWeight={600} mb={1}>
+      Vehicle History
+    </Typography>
+    <Grid container spacing={1.5}>
+      <Grid item xs={6}>
+        <Typography variant="body2" fontWeight={600}>Total KM:</Typography>
+        <Typography variant="body2" color="text.secondary">
+          {history.km.toFixed(2)} km
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="body2" fontWeight={600}>Number of Drivers:</Typography>
+        <Typography variant="body2" color="text.secondary">
+          {history.numberOfDrivers}
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="body2" fontWeight={600}>Had Accident:</Typography>
+        <Typography variant="body2" color="text.secondary">
+          {history.hasHadAccident ? 'Yes' : 'No'}
+        </Typography>
+      </Grid>
+      {history.hasHadAccident && (
+        <Grid item xs={12}>
+          <Typography variant="body2" fontWeight={600}>Accident Description:</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {history.accidentDescription}
+          </Typography>
+        </Grid>
+      )}
+    </Grid>
+  </Box>
+)}
 
+            
           </>
         ) : (
-          <Typography variant="body2">Loading reservation data...</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+            Loading vehicle data...
+          </Typography>
         )}
       </DialogContent>
     </Dialog>
@@ -183,19 +205,29 @@ const [history, setHistory] = useState(null);
 };
 
 const Info = ({ label, value, icon }) => (
-  <Grid item xs={6}>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {icon}
-      <Typography variant="body2" fontWeight={600}>{label}:</Typography>
-      <Typography variant="body2" color="text.secondary">{value}</Typography>
-    </Box>
+  <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+    {icon}
+    <Typography variant="body2" fontWeight={600} sx={{ minWidth: 60 }}>
+      {label}:
+    </Typography>
+    <Typography variant="body2" color="text.secondary" noWrap>
+      {value}
+    </Typography>
   </Grid>
 );
 
 const DetailRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-    <Typography variant="body2" fontWeight={600}>{label}:</Typography>
-    <Typography variant="body2" color="text.secondary">{value}</Typography>
+    <Typography variant="body2" fontWeight={600}>
+      {label}:
+    </Typography>
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      sx={{ maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+    >
+      {value}
+    </Typography>
   </Box>
 );
 
