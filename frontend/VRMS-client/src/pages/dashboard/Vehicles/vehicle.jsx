@@ -3,6 +3,8 @@ import {
   Box, MenuItem, TextField, Typography, Snackbar,
   Alert, Card, Grid, Button, Collapse, Chip, Paper, CircularProgress
 } from '@mui/material';
+import { CardBody } from '@material-tailwind/react';
+
 import Cookies from 'js-cookie';
 import CarDialog from './CarDialog';
 import BaseDialogContent from './BaseDialogContent';
@@ -13,6 +15,11 @@ import VehicleEmptyState from './VehicleEmptyState ';
 import VehicleInitialMessage from './VehicleInitialMessage';
 import MotorcycleDialog from './MotorcycleDialog';
 import BusDialog from './BusDialog';
+import { useTheme } from '@mui/material/styles';
+
+// Inside your component
+
+
 export function Vehicle() {
   const [vehicles, setVehicles] = useState([]);
   const [category, setCategory] = useState('');
@@ -26,41 +33,47 @@ export function Vehicle() {
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-const [year, setYear] = useState('');
-const [transmission, setTransmission] = useState('');
-  const fetchFilteredVehicles = async () => {
-    if (!startDate || !endDate || !category) {
-      setSnackbar({
-        open: true,
-        message: 'Start date, end date, and category are required.',
-        severity: 'warning',
-      });
-      return;
-    }
+  const [year, setYear] = useState('');
+  const [transmission, setTransmission] = useState('');
+  const theme = useTheme();
+const fetchFilteredVehicles = async () => {
+  if (!startDate || !endDate || !category) {
+    setSnackbar({
+      open: true,
+      message: 'Start date, end date, and category are required.',
+      severity: 'warning',
+    });
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const res = await api.get('/vehicles/available', {
-        params: {
-          startDate,
-          endDate,
-          category,
-          seats: seats !== ''  ? parseInt(seats) : undefined,
-          fuelType: fuelType || undefined,
-          year: year !== '' ? parseInt(year) : undefined,
-          transmission: transmission || undefined
-        }
-      });
-      setVehicles(res.data.$values || res.data);
-    } catch (err) {
-      console.error(err);
-      setVehicles([]);
-    } finally {
-      setLoading(false);
-    }
+  try {
+    setLoading(true);
+    const res = await api.get('/vehicles/available', {
+      params: {
+        startDate,
+        endDate,
+        category,
+        seats: seats !== '' ? parseInt(seats) : undefined,
+        fuelType: fuelType || undefined,
+        year: year !== '' ? parseInt(year) : undefined,
+        transmission: transmission || undefined
+      }
+    });
 
-    setSearchPerformed(true);
-  };
+    // Artificial delay of 700ms before showing results
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    setVehicles(res.data.$values || res.data);
+  } catch (err) {
+    console.error(err);
+    setVehicles([]);
+  } finally {
+    setLoading(false);
+  }
+
+  setSearchPerformed(true);
+};
+
 
   useEffect(() => {
     if (searchPerformed) {
@@ -68,187 +81,415 @@ const [transmission, setTransmission] = useState('');
     }
   }, [seats, fuelType, year, transmission]);
 
-const handleVehicleClick = async (id) => {
-  try {
-    let res;
-    if (category === 'Car') {
-      res = await api.get(`/cars/car/${id}`);
-    } else if (category === 'Motorcycle') {
-      res = await api.get(`/motorcycles/motorcycle/${id}`);
-    } else if (category === 'Bus') {
-      res = await api.get(`/buses/bus/${id}`);
-    }
-    else {
+  const handleVehicleClick = async (id) => {
+    try {
+      let res;
+      if (category === 'Car') {
+        res = await api.get(`/cars/car/${id}`);
+      } else if (category === 'Motorcycle') {
+        res = await api.get(`/motorcycles/motorcycle/${id}`);
+      } else if (category === 'Bus') {
+        res = await api.get(`/buses/bus/${id}`);
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Only Car and Motorcycle are supported at the moment.',
+          severity: 'error',
+        });
+        return;
+      }
+      setSelectedVehicle(res.data);
+      setShowVehicleDialog(true);
+    } catch (err) {
       setSnackbar({
         open: true,
-        message: 'Only Car and Motorcycle are supported at the moment.',
+        message: 'Failed to load vehicle details.',
         severity: 'error',
       });
-      return;
     }
-    setSelectedVehicle(res.data);
-    setShowVehicleDialog(true);
-  } catch (err) {
-    setSnackbar({
-      open: true,
-      message: 'Failed to load vehicle details.',
-      severity: 'error',
-    });
-  }
-};
+  };
 
-
-  return (
-    <Box p={4}>
-      <Typography variant="h5" gutterBottom>Vehicles</Typography>
-
-<Paper elevation={3} sx={{ p: 3, borderRadius: 3, mb: 3, backgroundColor: '#fdfdfd' }}>
-  <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }}>
-    Vehicle Search Filters
-  </Typography>
-
-  <Grid container spacing={2} alignItems="center">
-    <Grid item xs={12} md={4}>
-      <CalendarPickerSection
-        startDate={startDate}
-        endDate={endDate}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
+return (
+  <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-6">
+    {/* Header */}
+    <header className="max-w-6xl mx-auto mb-6 flex items-center gap-4 select-none">
+      <img
+        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+        alt="Vehicle Rent Management System Logo"
+        className="h-16 w-auto rounded-lg shadow-md"
+        draggable={false}
       />
-    </Grid>
+      <Typography variant="h5" color="blue-gray" className="font-semibold">
+        Vehicle Rent Management System — Search Vehicles
+      </Typography>
+    </header>
 
-        <Grid item xs={12} md={1}>
-            <TextField
-              select
-              fullWidth
-              label="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-               sx={{ width: 150, height:63 }} // 👈 wider dropdown
-            >
-              <MenuItem value="">Select Category</MenuItem>
-              <MenuItem value="Car">Car</MenuItem>
-              <MenuItem value="Bus">Bus</MenuItem>
-              <MenuItem value="Motorcycle">Motorcycle</MenuItem>
-              {/* <MenuItem value="Truck">Truck</MenuItem> */}
-            </TextField>
+    {/* Filters Card */}
+<Card
+  className="max-w-7xl mx-auto p-6 border border-blue-gray-100 shadow-lg bg-white"
+  sx={{ borderRadius: 2 }} // MUI spacing scale: 5 = 40px
+>
+      <CardBody className="p-4">
+          <Typography
+            variant="h6"
+          color="text.primary"
+          sx={{
+            fontWeight: 700,       // bolder font weight for emphasis
+            mb: 3,                 // margin bottom for spacing
+            letterSpacing: 0.5,    // slight letter spacing for cleaner look
+            textAlign: 'center',   // center align for better focus
+          }}
+        >
+          Find Your Perfect Vehicle
+        </Typography>
+
+
+          <Grid container spacing={2} alignItems="center" className="mb-2" sx={{ mt: 5 }}>
+
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+                  <Grid
+  item
+  xs={12}
+  md={2.5}
+  sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    position: 'relative',
+    pr: 2,             // add right padding to separate from divider
+    height: '40px',
+    mt: '-4px',
+  }}
+>
+                    <Box
+                      sx={{
+                        mb: 1,
+                        fontWeight: 600,
+                        color: (theme) => theme.palette.text.secondary,
+                        fontSize: '0.875rem',
+                        userSelect: 'none',
+                        lineHeight: 1.1,
+                        textAlign: 'center',
+                        flexGrow: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#64748b',
+                          fontStyle: 'italic',
+                          px: 2,
+                          mt: 1,
+                          width: '100%',
+                          textAlign: 'center',
+                        }}
+                      >
+                        Select Rental Period
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                      <CalendarPickerSection
+                        startDate={startDate}
+                        endDate={endDate}
+                        setStartDate={setStartDate}
+                        setEndDate={setEndDate}
+                      />
+                    </Box>
+                  </Grid>
+                  
+                    <Box
+                      sx={{
+                        width: '1px',
+                        height: '60px',
+                        backgroundColor: (theme) => theme.palette.divider,
+                        mx: 3,         // horizontal margin left and right
+                        alignSelf: 'center',  // vertically center in flex container
+                      }}
+                    />
+
+                  <Grid
+  item
+  xs={12}
+  md={4}
+  sx={{
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative',
+    pl: 2,            // left padding to separate divider from content
+    pr: 2,            // right padding for next divider
+    mt: '-13px',
+  }}
+>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
+                        width: '100%',
+                        maxWidth: 180,
+                      }}
+                    >
+                  <Typography
+                    variant="body2"
+                      sx={{
+                        color: '#64748b', // equivalent to text-blue-gray-500 from Tailwind
+                        fontStyle: 'italic',
+                        px: 2,
+                        mt: 1,
+                        width: '100%',
+                        textAlign: 'center',
+                      }}
+                  >
+                  Select Category
+                  </Typography>
+
+                          <TextField
+                            select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            size="small"
+                            sx={{
+                              borderRadius: 1.5,
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'divider',
+                              },
+                              width: '100%',
+                              minWidth: 150,
+                            }}
+                          >
+                            <MenuItem value="Car">Car</MenuItem>
+                            <MenuItem value="Bus">Bus</MenuItem>
+                            <MenuItem value="Motorcycle">Motorcycle</MenuItem>
+                          </TextField>
+
+
+                    </Box>
+                  </Grid>
+
+                    <Box
+                    sx={{
+                      width: '1px',
+                      height: '60px',
+                      backgroundColor: (theme) => theme.palette.divider,
+                      mx: 3,         // horizontal margin left and right
+                      alignSelf: 'center',  // vertically center in flex container
+                    }}
+                  />
+
+                  <Grid
+                    item
+                    xs={12}
+                    md={2.5}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      position: 'relative',
+                      pr: 3,
+                      height: 42,
+                      mt: 2,
+                      pl: 2,
+                    }}
+                  >
+                <Button
+                  variant="contained"
+                  size="medium"              // Use MUI size prop for consistent sizing
+                  onClick={fetchFilteredVehicles}
+                  disabled={!startDate || !endDate || !category}
+                  sx={{
+                    fontWeight: 600,
+                    textTransform: 'capitalize',
+                    backgroundColor: '#2C3E50', // Dark professional blue-gray
+                    color: '#FFFFFF',
+                    minWidth: 140,            // Use minWidth for responsive behavior
+                    borderRadius: 2,
+                    boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
+                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: '#1A2533', // Darker on hover
+                      boxShadow: '0 6px 12px rgba(0,0,0,0.24)',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#A0A0A0',
+                      color: '#E0E0E0',
+                      boxShadow: 'none',
+                    },
+                  }}
+                >
+                  Search
+                </Button>
+
+                  </Grid>
+
+
+
+                  
+              </Box>
+
           </Grid>
 
-    <Grid item xs={12} md={4}>
-      <Button
-        variant="contained"
-        fullWidth
-        onClick={fetchFilteredVehicles}
-        disabled={!startDate || !endDate || !category}
-        sx={{ height: 60 }}
-      >
-        Search Available Vehicles
-      </Button>
-    </Grid>
-  </Grid>
 
-  <Box mt={2}>
-    <Button
-      variant="text"
-      onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-      sx={{ fontWeight: 500 }}
-    >
-      {showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
-    </Button>
+
+
+
+<Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  {/* Show/Hide Button */}
+  <Box sx={{ mb: 2 }}>
+   <Button
+  variant="outlined"
+  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+  sx={{
+    fontWeight: 600,
+    textTransform: 'none',      // no all caps, more professional
+    borderRadius: 1.5,
+    px: 2,                      // less horizontal padding
+    py: 0.5,                    // less vertical padding
+    fontSize: '0.85rem',        // slightly smaller text
+    minWidth: 140,              // keep a decent width but compact
+    borderColor: 'primary.main',
+    color: 'primary.main',
+    boxShadow: 'none',
+    transition: 'background-color 0.25s ease, color 0.25s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(25, 118, 210, 0.12)',  // subtle hover
+      borderColor: 'primary.dark',
+      color: 'primary.dark',
+      boxShadow: 'none',
+    },
+    '&:active': {
+      backgroundColor: 'rgba(25, 118, 210, 0.2)',   // subtle active press
+      boxShadow: 'none',
+    },
+    '&:disabled': {
+      borderColor: 'rgba(0, 0, 0, 0.12)',
+      color: 'rgba(0, 0, 0, 0.26)',
+    },
+  }}
+>
+  {showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+</Button>
+
   </Box>
 
-  <Collapse in={showAdvancedFilters}>
-    <Grid container spacing={2} sx={{ mt: 1 }}>
-      <Grid item xs={12} sm={6} md={3}>
-        <TextField
-          select
-          label="Seats"
-          fullWidth
-          value={seats}
-          onChange={(e) => setSeats(e.target.value)}
-          size="small"
-          sx={{ width: 150 }} // 👈 wider dropdown
-        >
-          <MenuItem value="">All</MenuItem>
-          {[2, 4, 5, 6, 7, 8].map((seat) => (
-            <MenuItem key={seat} value={seat}>{seat}</MenuItem>
-          ))}
-        </TextField>
-      </Grid>
+  {/* The message, centered */}
+  {showAdvancedFilters && (
+    <>
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#64748b',
+          fontStyle: 'italic',
+          px: 2,
+          mb: 2,
+          width: '100%',
+          maxWidth: 800,
+          textAlign: 'center',
+        }}
+      >
+        Use the advanced filters below to refine your vehicle search.
+      </Typography>
 
-      <Grid item xs={12} sm={6} md={3}>
-        <TextField
-          select
-          label="Fuel Type"
-          fullWidth
-          value={fuelType}
-          onChange={(e) => setFuelType(e.target.value)}
-          size="small"
-          sx={{ width: 150 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="Petrol">Petrol</MenuItem>
-          <MenuItem value="Diesel">Diesel</MenuItem>
-          <MenuItem value="Electric">Electric</MenuItem>
-          <MenuItem value="Hybrid">Hybrid</MenuItem>
-        </TextField>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={3}>
-        <TextField
-          select
-          label="Year"
-          fullWidth
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          size="small"
-          sx={{ width: 150 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          {Array.from({ length: 20 }, (_, i) => {
-            const y = new Date().getFullYear() - i;
-            return (
-              <MenuItem key={y} value={y}>{y}</MenuItem>
-            );
-          })}
-        </TextField>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={3}>
-        <TextField
-          select
-          label="Transmission"
-          fullWidth
-          value={transmission}
-          onChange={(e) => setTransmission(e.target.value)}
-          size="small"
-          sx={{ width: 150 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="Manual">Manual</MenuItem>
-          <MenuItem value="Automatic">Automatic</MenuItem>
-        </TextField>
-      </Grid>
-    </Grid>
-  </Collapse>
-</Paper>
-
-
-      <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        {seats && (
-          <Chip label={`Seats: ${seats}`} onDelete={() => setSeats('')} color="primary" />
-        )}
-        {fuelType && (
-          <Chip label={`Fuel: ${fuelType}`} onDelete={() => setFuelType('')} color="secondary" />
-        )}
-        {year && (
-          <Chip label={`Year: ${year}`} onDelete={() => setYear('')} color="info" />
-        )}
-        {transmission && (
-          <Chip label={`Transmission: ${transmission}`} onDelete={() => setTransmission('')} color="warning" />
-        )}
+      {/* Filters with vertical lines */}
+      <Box sx={{ display: 'flex', overflowX: 'auto', maxWidth: 800 }}>
+        {[
+          {
+            label: 'Seats',
+            value: seats,
+            onChange: (e) => setSeats(e.target.value),
+            options: ['', 2, 4, 5, 6, 7, 8],
+          },
+          {
+            label: 'Fuel Type',
+            value: fuelType,
+            onChange: (e) => setFuelType(e.target.value),
+            options: ['', 'Petrol', 'Diesel', 'Electric', 'Hybrid'],
+          },
+          {
+            label: 'Year',
+            value: year,
+            onChange: (e) => setYear(e.target.value),
+            options: Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i),
+          },
+          {
+            label: 'Transmission',
+            value: transmission,
+            onChange: (e) => setTransmission(e.target.value),
+            options: ['', 'Manual', 'Automatic'],
+          },
+        ].map(({ label, value, onChange, options }, i, arr) => (
+          <Box
+            key={label}
+            sx={{
+              minWidth: 180,
+              px: 2,
+              
+              borderRight: i !== arr.length - 1 ? '1px solid' : 'none',
+              borderColor: 'divider',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <TextField
+              select
+              label={label}
+              fullWidth
+              value={value}
+              onChange={onChange}
+              size="small"
+              sx={{ mt: 1 }}
+            >
+              {options.map((opt) => (
+                <MenuItem key={opt || 'all'} value={opt}>
+                  {opt === '' ? 'All' : opt}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        ))}
       </Box>
+    </>
+  )}
+</Box>
 
+
+
+
+
+
+
+
+
+
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#64748b',
+          fontStyle: 'italic',
+          px: 2,
+          mt: 1,
+          width: '100%',
+          textAlign: 'center',
+        }}
+      >
+        Use the filters above to refine your vehicle search and find the perfect match for your rental needs.
+      </Typography>
+      </CardBody>
+    </Card>
+
+    {/* Chips */}
+    <Box className="max-w-7xl mx-auto mt-4 mb-2 flex gap-2 flex-wrap">
+      {seats && <Chip label={`Seats: ${seats}`} onDelete={() => setSeats('')} color="primary" />}
+      {fuelType && <Chip label={`Fuel: ${fuelType}`} onDelete={() => setFuelType('')} color="secondary" />}
+      {year && <Chip label={`Year: ${year}`} onDelete={() => setYear('')} color="info" />}
+      {transmission && <Chip label={`Transmission: ${transmission}`} onDelete={() => setTransmission('')} color="warning" />}
+    </Box>
+
+    {/* Results */}
+    <div className="max-w-7xl mx-auto mt-4">
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
       ) : (
@@ -256,13 +497,13 @@ const handleVehicleClick = async (id) => {
           {!searchPerformed && <VehicleInitialMessage />}
           {searchPerformed && vehicles.length === 0 && <VehicleEmptyState />}
 
-          {['Car', 'Bus', 'Motorcycle', 'Truck'].map((cat) => {
+          {['Car', 'Bus', 'Motorcycle'].map((cat) => {
             const categoryVehicles = vehicles.filter((v) => v.category === cat);
             if (!categoryVehicles.length) return null;
 
             return (
               <Box key={cat} sx={{ mb: 4 }}>
-                <Typography variant="h6" sx={{ mt: 3, color: 'primary.main' }}>{cat}s</Typography>
+                <Typography variant="h6" sx={{ mt: 3, color: 'primary.main', fontWeight: 'bold' }}>{cat}s</Typography>
                 <Grid container spacing={3}>
                   {categoryVehicles.map((vehicle, idx) => (
                     <Slide
@@ -277,19 +518,15 @@ const handleVehicleClick = async (id) => {
                         <Card
                           variant="outlined"
                           sx={{
-                            borderRadius: 2,
-                            boxShadow: 3,
+                            borderRadius: 3,
+                            boxShadow: 2,
                             transition: 'transform 0.2s ease-in-out',
                             '&:hover': { transform: 'scale(1.02)' },
                             cursor: 'pointer'
                           }}
                           onClick={() => handleVehicleClick(vehicle.vehicleId)}
                         >
-                          <BaseDialogContent
-                            vehicle={vehicle}
-                            startDate={startDate}
-                            endDate={endDate}
-                          />
+                          <BaseDialogContent vehicle={vehicle} startDate={startDate} endDate={endDate} />
                         </Card>
                       </Grid>
                     </Slide>
@@ -300,38 +537,40 @@ const handleVehicleClick = async (id) => {
           })}
         </>
       )}
+    </div>
 
-{category === 'Car' && (
-  <CarDialog
-    open={showVehicleDialog}
-    onClose={() => setShowVehicleDialog(false)}
-    vehicle={selectedVehicle}
-    startDate={startDate}
-    endDate={endDate}
-  />
-)}
+    {/* Dialogs */}
+    {category === 'Car' && (
+      <CarDialog
+        open={showVehicleDialog}
+        onClose={() => setShowVehicleDialog(false)}
+        vehicle={selectedVehicle}
+        startDate={startDate}
+        endDate={endDate}
+      />
+    )}
+    {category === 'Motorcycle' && (
+      <MotorcycleDialog
+        open={showVehicleDialog}
+        onClose={() => setShowVehicleDialog(false)}
+        vehicle={selectedVehicle}
+        startDate={startDate}
+        endDate={endDate}
+      />
+    )}
 
-{category === 'Motorcycle' && (
-  <MotorcycleDialog
-    open={showVehicleDialog}
-    onClose={() => setShowVehicleDialog(false)}
-    vehicle={selectedVehicle}
-    startDate={startDate}
-    endDate={endDate}
-  />
-)}
+    {/* Snackbar */}
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={5000}
+      onClose={() => setSnackbar({ ...snackbar, open: false })}
+    >
+      <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+    </Snackbar>
+  </div>
+);
 
 
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={5000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
-      </Snackbar>
-    </Box>
-  );
 }
 
 export default Vehicle;
