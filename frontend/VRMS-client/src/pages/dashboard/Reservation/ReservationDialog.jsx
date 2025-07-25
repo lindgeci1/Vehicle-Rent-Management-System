@@ -95,102 +95,103 @@ const ReservationDialog = ({ open, onClose, reservationId }) => {
               )}
             </Box>
 
-<Box
-  sx={{
-    backgroundColor: 'background.paper',
-    p: 1.5,
-    borderRadius: 1.5,
-    mb: 2,
-    border: '1px solid',
-    borderColor: 'divider',
-  }}
->
-  <Typography variant="subtitle1" fontWeight={600} mb={1}>
-    Vehicle Information
-  </Typography>
-  <Grid container spacing={1.5}>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Mark:</Typography>
-      <Typography variant="body2" color="text.secondary">{vehicle.mark}</Typography>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Model:</Typography>
-      <Typography variant="body2" color="text.secondary">{vehicle.model}</Typography>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Year:</Typography>
-      <Typography variant="body2" color="text.secondary">{vehicle.year}</Typography>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Fuel Type:</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <LocalGasStation fontSize="small" />
-        <Typography variant="body2" color="text.secondary">{vehicle.fuelType}</Typography>
-      </Box>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Seats:</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <EventSeat fontSize="small" />
-        <Typography variant="body2" color="text.secondary">{vehicle.seatingCapacity}</Typography>
-      </Box>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography variant="body2" fontWeight={600}>Transmission:</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <SyncAlt fontSize="small" />
-        <Typography variant="body2" color="text.secondary">{vehicle.transmission || 'N/A'}</Typography>
-      </Box>
-    </Grid>
-  </Grid>
-</Box>
+              {/* Vehicle Information */}
+            <Box
+              sx={{
+                backgroundColor: 'background.paper',
+                p: 1.5,
+                borderRadius: 1.5,
+                mb: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight={600} mb={1}>
+                Vehicle Information
+              </Typography>
+              <Grid container spacing={1.5}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Mark:</Typography>
+                  <Typography variant="body2" color="text.secondary">{vehicle.mark}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Model:</Typography>
+                  <Typography variant="body2" color="text.secondary">{vehicle.model}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Year:</Typography>
+                  <Typography variant="body2" color="text.secondary">{vehicle.year}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Fuel Type:</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LocalGasStation fontSize="small" />
+                    <Typography variant="body2" color="text.secondary">{vehicle.fuelType}</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Seats:</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <EventSeat fontSize="small" />
+                    <Typography variant="body2" color="text.secondary">{vehicle.seatingCapacity}</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontWeight={600}>Transmission:</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <SyncAlt fontSize="small" />
+                    <Typography variant="body2" color="text.secondary">{vehicle.transmission || 'N/A'}</Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
 
 
 
-{history && (
-  <Box
-    sx={{
-      backgroundColor: 'background.paper',
-      p: 1.5,
-      borderRadius: 1.5,
-      border: '1px solid',
-      borderColor: 'divider',
-      mb: 2,
-    }}
-  >
-    <Typography variant="subtitle1" fontWeight={600} mb={1}>
-      Vehicle History
-    </Typography>
-    <Grid container spacing={1.5}>
-      <Grid item xs={6}>
-        <Typography variant="body2" fontWeight={600}>Total KM:</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {history.km.toFixed(2)} km
-        </Typography>
-      </Grid>
-      <Grid item xs={6}>
-        <Typography variant="body2" fontWeight={600}>Number of Drivers:</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {history.numberOfDrivers}
-        </Typography>
-      </Grid>
-      <Grid item xs={6}>
-        <Typography variant="body2" fontWeight={600}>Had Accident:</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {history.hasHadAccident ? 'Yes' : 'No'}
-        </Typography>
-      </Grid>
-      {history.hasHadAccident && (
-        <Grid item xs={12}>
-          <Typography variant="body2" fontWeight={600}>Accident Description:</Typography>
-          <Typography variant="body2" color="text.secondary">
-            {history.accidentDescription}
+      {history && (
+        <Box
+          sx={{
+            backgroundColor: 'background.paper',
+            p: 1.5,
+            borderRadius: 1.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            mb: 2,
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={600} mb={1}>
+            Vehicle History
           </Typography>
-        </Grid>
+          <Grid container spacing={1.5}>
+            <Grid item xs={6}>
+              <Typography variant="body2" fontWeight={600}>Total KM:</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {history.km.toFixed(2)} km
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" fontWeight={600}>Number of Drivers:</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {history.numberOfDrivers}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" fontWeight={600}>Had Accident:</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {history.hasHadAccident ? 'Yes' : 'No'}
+              </Typography>
+            </Grid>
+            {history.hasHadAccident && (
+              <Grid item xs={12}>
+                <Typography variant="body2" fontWeight={600}>Accident Description:</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {history.accidentDescription}
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
       )}
-    </Grid>
-  </Box>
-)}
 
             
           </>
@@ -203,32 +204,5 @@ const ReservationDialog = ({ open, onClose, reservationId }) => {
     </Dialog>
   );
 };
-
-const Info = ({ label, value, icon }) => (
-  <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-    {icon}
-    <Typography variant="body2" fontWeight={600} sx={{ minWidth: 60 }}>
-      {label}:
-    </Typography>
-    <Typography variant="body2" color="text.secondary" noWrap>
-      {value}
-    </Typography>
-  </Grid>
-);
-
-const DetailRow = ({ label, value }) => (
-  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-    <Typography variant="body2" fontWeight={600}>
-      {label}:
-    </Typography>
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      sx={{ maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-    >
-      {value}
-    </Typography>
-  </Box>
-);
 
 export default ReservationDialog;

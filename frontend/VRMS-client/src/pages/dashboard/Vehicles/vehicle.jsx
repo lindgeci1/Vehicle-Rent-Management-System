@@ -110,21 +110,31 @@ const fetchFilteredVehicles = async () => {
   };
 
 return (
-  <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-6">
-    {/* Header */}
-    <header className="max-w-6xl mx-auto mb-6 flex items-center gap-4 select-none">
-      <img
-        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-        alt="Vehicle Rent Management System Logo"
-        className="h-16 w-auto rounded-lg shadow-md"
-        draggable={false}
-      />
-      <Typography variant="h5" color="blue-gray" className="font-semibold">
-        Vehicle Rent Management System — Search Vehicles
-      </Typography>
-    </header>
+  <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-8">
 
-    {/* Filters Card */}
+
+     <header className="max-w-5xl mx-auto mb-6 flex items-center gap-4 select-none">
+    
+          <img
+            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"    
+            alt="Vehicle Rent Management System Logo"
+              className="h-20 w-auto rounded-lg shadow-md" // changed from h-14 to h-20
+              draggable={false}
+            />
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 600,         // makes it bold like 'font-semibold'
+             color: '#0f172a', // exact match for Tailwind's text-blue-gray-900
+          }}
+        >
+          Vehicle Rent Management System — Search
+        </Typography>
+
+
+          </header>
+
+
 <Card
   className="max-w-7xl mx-auto p-6 border border-blue-gray-100 shadow-lg bg-white"
   sx={{ borderRadius: 2 }} // MUI spacing scale: 5 = 40px
@@ -144,7 +154,7 @@ return (
         </Typography>
 
 
-          <Grid container spacing={2} alignItems="center" className="mb-2" sx={{ mt: 5 }}>
+          <Grid container spacing={2} alignItems="center" className="mb-2" sx={{ mt: 3 }}>
 
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
 
@@ -324,21 +334,13 @@ return (
                 </Button>
 
                   </Grid>
-
-
-
-                  
+                
               </Box>
-
           </Grid>
 
-
-
-
-
-<Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+<Box sx={{ mt: 5, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
   {/* Show/Hide Button */}
-  <Box sx={{ mb: 2 }}>
+  <Box sx={{ mb: 1 }}>
    <Button
   variant="outlined"
   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -497,44 +499,72 @@ return (
           {!searchPerformed && <VehicleInitialMessage />}
           {searchPerformed && vehicles.length === 0 && <VehicleEmptyState />}
 
-          {['Car', 'Bus', 'Motorcycle'].map((cat) => {
-            const categoryVehicles = vehicles.filter((v) => v.category === cat);
-            if (!categoryVehicles.length) return null;
+{vehicles.length > 0 && (
+  <Box sx={{ mb: 4, textAlign: 'center' }}>
+    {/* Top horizontal line */}
+    <Box
+      sx={{
+        height: 2,
+        bgcolor: 'divider',
+        mb: 2,
+        mx: 'auto',
+        maxWidth: 600,
+        borderRadius: 1,
+      }}
+    />
 
-            return (
-              <Box key={cat} sx={{ mb: 4 }}>
-                <Typography variant="h6" sx={{ mt: 3, color: 'primary.main', fontWeight: 'bold' }}>{cat}s</Typography>
-                <Grid container spacing={3}>
-                  {categoryVehicles.map((vehicle, idx) => (
-                    <Slide
-                      key={vehicle.vehicleId}
-                      direction="up"
-                      in={searchPerformed}
-                      style={{ transitionDelay: `${idx * 100}ms` }}
-                      mountOnEnter
-                      unmountOnExit
-                    >
-                      <Grid item xs={12} sm={6} md={4} lg={3}>
-                        <Card
-                          variant="outlined"
-                          sx={{
-                            borderRadius: 3,
-                            boxShadow: 2,
-                            transition: 'transform 0.2s ease-in-out',
-                            '&:hover': { transform: 'scale(1.02)' },
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => handleVehicleClick(vehicle.vehicleId)}
-                        >
-                          <BaseDialogContent vehicle={vehicle} startDate={startDate} endDate={endDate} />
-                        </Card>
-                      </Grid>
-                    </Slide>
-                  ))}
-                </Grid>
-              </Box>
-            );
-          })}
+    <Typography
+      variant="subtitle1"
+      sx={{ color: 'primary.main', fontWeight: 'bold', textTransform: 'uppercase', mb: 2 }}
+    >
+      Available Vehicles
+    </Typography>
+
+    {/* Bottom horizontal line */}
+    <Box
+      sx={{
+        height: 2,
+        bgcolor: 'divider',
+        mt: 2,
+        mx: 'auto',
+        maxWidth: 600,
+        borderRadius: 1,
+      }}
+    />
+
+    <Grid container spacing={3} sx={{ mt: 3 }}>
+      {vehicles.map((vehicle, idx) => (
+        <Slide
+          key={vehicle.vehicleId}
+          direction="up"
+          in={searchPerformed}
+          style={{ transitionDelay: `${idx * 100}ms` }}
+          mountOnEnter
+          unmountOnExit
+        >
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <Card
+              variant="outlined"
+              sx={{
+                borderRadius: 3,
+                boxShadow: 2,
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': { transform: 'scale(1.02)' },
+                cursor: 'pointer',
+              }}
+              onClick={() => handleVehicleClick(vehicle.vehicleId)}
+            >
+              <BaseDialogContent vehicle={vehicle} startDate={startDate} endDate={endDate} />
+            </Card>
+          </Grid>
+        </Slide>
+      ))}
+    </Grid>
+  </Box>
+)}
+
+
+
         </>
       )}
     </div>
@@ -551,6 +581,16 @@ return (
     )}
     {category === 'Motorcycle' && (
       <MotorcycleDialog
+        open={showVehicleDialog}
+        onClose={() => setShowVehicleDialog(false)}
+        vehicle={selectedVehicle}
+        startDate={startDate}
+        endDate={endDate}
+      />
+    )}
+
+    {category === 'Bus' && (
+      <BusDialog
         open={showVehicleDialog}
         onClose={() => setShowVehicleDialog(false)}
         vehicle={selectedVehicle}
