@@ -73,12 +73,14 @@ function ReservationViewCustomer({ reservations, getVehicleName, onDelete }) {
       {/* Header */}
       <Box textAlign="center" mb={5}>
         <Typography
-          variant="h4"
-          className="font-semibold text-blue-gray-900"
-          gutterBottom
-        >
-          Your Reservations
-        </Typography>
+                  variant="h4"
+                  sx={{
+                    fontWeight: 600,         // makes it bold like 'font-semibold'
+                     color: '#0f172a', // exact match for Tailwind's text-blue-gray-900
+                  }}
+                >
+                  Your Reservations
+                </Typography>
         <Typography
           variant="body2"
           className="text-blue-gray-500 italic px-2 mt-6"
