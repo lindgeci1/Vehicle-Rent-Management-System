@@ -1,6 +1,7 @@
 // src/components/vehicle/ratings/VehicleRatingViewCustomer.jsx
 
 import React, { useEffect, useState } from 'react'
+import { Rating } from '@mui/material'
 import {
   Box,
   Typography,
@@ -25,7 +26,8 @@ import {
 import { api } from '@/apiClient'
 import Cookies from 'js-cookie'
 import { decodeToken } from '../../../../decodeToken'
- import { Add } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
+
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A'
   const d = new Date(dateStr)
@@ -67,37 +69,28 @@ const VehicleRatingViewCustomer = ({
     if (ratings.length) fetchPhotos()
   }, [ratings, token])
 
-  // Rotate photos every 3 seconds
-  useEffect(() => {
-    const intervalMap = {}
-    Object.keys(vehiclePhotos).forEach((vehicleId) => {
-      if (vehiclePhotos[vehicleId]?.length > 1) {
-        intervalMap[vehicleId] = setInterval(() => {
-          setPhotoIndices((prev) => ({
-            ...prev,
-            [vehicleId]: ((prev[vehicleId] || 0) + 1) % vehiclePhotos[vehicleId].length
-          }))
-        }, 3000)
-      }
-    })
-    return () => Object.values(intervalMap).forEach(clearInterval)
-  }, [vehiclePhotos])
 
   return (
-    <Box>
-  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-    <Typography variant="h5" fontWeight={600}>
-       My Vehicle Ratings
-    </Typography>
-    {/* <Button
-      variant="contained"
-      color="primary"
-      startIcon={<Add />}
-      onClick={onAdd}
-    >
-      Add
-    </Button> */}
-  </Stack>
+    <Box className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-6">
+      {/* Header */}
+      <Box textAlign="center" mb={5}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 600,
+            color: '#0f172a',
+          }}
+        >
+          My Vehicle Ratings
+        </Typography>
+        <Typography
+          variant="body2"
+          className="text-blue-gray-500 italic px-2 mt-6"
+          textAlign="center"
+        >
+          After completing trips, your vehicle ratings will appear here to help you track your experience.
+        </Typography>
+      </Box>
 
       {ratings.length === 0 && (
         <Box
@@ -142,104 +135,140 @@ const VehicleRatingViewCustomer = ({
           </Typography>
         </Box>
       )}
+<Grid container spacing={4} justifyContent="center">
+  {ratings.map((r) => {
+    const photos = vehiclePhotos[r.vehicleId] || []
+    const currentPhoto = photos[0]
 
-      <Grid container spacing={2}>
-        {ratings.map((r) => {
-          const photos = vehiclePhotos[r.vehicleId] || []
-          const currentPhoto = photos[photoIndices[r.vehicleId] || 0]
+    return (
+      <Grid item xs={12} sm={6} md={3} key={r.id}>
+        <Card
+          onClick={() => onEdit(r.id)}
+          sx={{
+            cursor: 'pointer',
+            borderRadius: 3,
+            boxShadow: 4,
+            bgcolor: 'background.paper',
+            transition: 'all 0.3s ease',
+            overflow: 'hidden',
+            width: 300,
+            '&:hover': {
+              boxShadow: 6,
+            },
+          }}
+        >
+          {/* Vehicle Image */}
+          <Box
+            sx={{
+              height: 200,
+              width: '100%',
+              maxWidth: 350,
+              bgcolor: '#eaeaea',
+              borderTopLeftRadius: 12,
+              borderTopRightRadius: 12,
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mx: 'auto',
+            }}
+          >
+            {currentPhoto ? (
+              <img
+                src={currentPhoto.url}
+                alt="Vehicle"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <Typography color="text.disabled" variant="subtitle1" sx={{ p: 2 }}>
+                No Image Available
+              </Typography>
+            )}
+          </Box>
 
-          return (
-            <Grid item xs={12} md={6} key={r.id}>
-              <Card
-                variant="outlined"
-                sx={{
-                  borderRadius: 2,
-                  width: 330,
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': { transform: 'translateY(-2px)', cursor: 'pointer' }
-                }}
-                onClick={() => onEdit(r.id)} // Entire card is clickable to open update screen
+          {/* Header with vehicle name + rating date */}
+          <Box sx={{ px: 2, pt: 2 }}>
+            <Typography
+              variant="h6"
+              fontWeight={700}
+              sx={{ mb: 0.5, color: 'text.primary' }}
+              noWrap
+              title={getVehicleName(r.vehicleId)}
+            >
+              {getVehicleName(r.vehicleId)}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 1 }}
+            >
+              {formatDate(r.createdAt)}
+            </Typography>
+          </Box>
+
+          <Divider />
+
+          {/* Rating row with stars and value */}
+          <Box sx={{ px: 2, pt: 1 }}>
+            <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+              <StarIcon fontSize="small" color="warning" />
+              <Typography variant="body2" fontWeight={600} minWidth={60}>
+                Rating:
+              </Typography>
+              <Typography variant="body2">
+                {r.ratingValue} / 5
+              </Typography>
+            </Stack>
+
+            {/* Comment row, label and value close */}
+            <Stack direction="row" spacing={1} alignItems="flex-start" mb={1}>
+              <Typography
+                variant="body2"
+                fontWeight={600}
+                sx={{ whiteSpace: 'nowrap', minWidth: 60 }}
               >
-                {currentPhoto && (
-                  <Box
-                    sx={{
-                      height: 200,
-                      width: 330,
-                      mx: 'auto',
-                      overflow: 'hidden',
-                      borderTopLeftRadius: 8,
-                      borderTopRightRadius: 8,
-                      backgroundColor: '#f4f4f4'
-                    }}
-                  >
-                    <img
-                      src={currentPhoto.url}
-                      alt="Vehicle"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </Box>
-                )}
+                Comment:
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ wordBreak: 'break-word', flex: 1 }}
+              >
+                {r.reviewComment || 'No comment'}
+              </Typography>
+            </Stack>
 
-                <CardHeader
-                  avatar={<CarIcon color="primary" />}
-                  title={getVehicleName(r.vehicleId)}
-                  titleTypographyProps={{ fontWeight: 600, fontSize: 16 }}
-                  subheader={formatDate(r.createdAt)}
-                />
-                <Divider />
+            {/* Add extra date info line if you want (e.g., updatedAt or rating date again) */}
+            {/* <Stack direction="row" spacing={1} alignItems="center">
+              <CalendarToday fontSize="small" color="action" />
+              <Typography variant="body2" color="text.secondary">
+                {formatDate(r.updatedAt || r.createdAt)}
+              </Typography>
+            </Stack> */}
+          </Box>
 
-                <CardContent>
-                  <Stack spacing={1.5}>
-                    <InfoRow
-                      label="Customer"
-                      value={getCustomerName(r.customerId)}
-                      icon={<PersonIcon fontSize="small" />}
-                    />
-                    <InfoRow
-                      label="Rating"
-                      value={`${r.ratingValue} / 5`}
-                      icon={<StarIcon fontSize="small" />}
-                    />
-                    <InfoRow
-                      label="Comment"
-                      value={r.reviewComment || 'No comment'}
-                      icon={<CalendarToday fontSize="small" />}
-                    />
-                  </Stack>
-                </CardContent>
+          <Divider sx={{ mx: 2, mt: 1 }} />
 
-                <Divider sx={{ mx: 2 }} />
-
-                <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  {/* Edit button */}
-                  {/* <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={(e) => {
-                      e.stopPropagation() // Prevent the card onClick from firing
-                      onEdit(r.id)
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton> */}
-
-                  {/* Delete button */}
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={(e) => {
-                      e.stopPropagation() // Prevent the card onClick from firing
-                      onDelete(r.id)
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </CardActions>
-              </Card>
-            </Grid>
-          )
-        })}
+          {/* Actions */}
+          <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(r.id)
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </CardActions>
+        </Card>
       </Grid>
+    )
+  })}
+</Grid>
+
+
     </Box>
   )
 }
