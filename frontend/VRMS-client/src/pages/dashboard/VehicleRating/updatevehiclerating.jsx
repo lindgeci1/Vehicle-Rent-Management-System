@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import Cookies from 'js-cookie';
 import { api } from '@/apiClient';
+import { Rating } from '@mui/material';
 import { showSuccess } from '../../../crudNotifications';
 export function Updatevehiclerating({ id, onClose, onUpdated }) {
   const [formData, setFormData] = useState(null);
@@ -172,21 +173,23 @@ export function Updatevehiclerating({ id, onClose, onUpdated }) {
             <FormHelperText>Select the vehicle for the rating</FormHelperText>
           </Grid>
 
-          {/* Rating */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              size="small"
-              margin="dense"
-              label="Rating (1–5)"
-              name="ratingValue"
-              type="number"
-              inputProps={{ min: 1, max: 5 }}
-              value={formData.ratingValue}
-              onChange={handleChange}
-              fullWidth
-            />
-            <FormHelperText>Rate the vehicle from 1 to 5</FormHelperText>
-          </Grid>
+        {/* Rating */}
+        <Grid item xs={12} sm={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+            Rating (1–5)
+          </Typography>
+          <Rating
+            name="ratingValue"
+            value={Number(formData.ratingValue)}
+            onChange={(event, newValue) => {
+              setFormData(prev => ({ ...prev, ratingValue: newValue || 0 }));
+            }}
+            precision={1}
+            size="medium"
+          />
+          <FormHelperText>Rate the vehicle from 1 to 5</FormHelperText>
+        </Grid>
+
 
           {/* Comment */}
           <Grid item xs={12} sm={6}>

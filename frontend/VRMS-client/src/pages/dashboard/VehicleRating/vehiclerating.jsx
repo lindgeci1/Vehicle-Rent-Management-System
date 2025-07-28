@@ -408,7 +408,7 @@ export function VehicleRating() {
       <ConfirmDialog
         open={showDeleteDialog}
         title="Confirm Delete"
-        content="Are you sure you want to delete this rating?"
+        content="Are you sure you want to remove your review for this vehicle?"
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleDelete}
       />
