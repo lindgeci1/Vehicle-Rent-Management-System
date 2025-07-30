@@ -13,6 +13,7 @@ import {
   IconButton,
   CardMedia
 } from '@mui/material';
+import { Rating } from '@mui/material'
 import {
   DirectionsBus,
   LocalGasStation,

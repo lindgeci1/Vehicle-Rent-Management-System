@@ -123,7 +123,7 @@ export default function VehicleUsagePercentageChart({ userId }) {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-
+<div className="mt-1 border-t pt-1 flex justify-between items-center">
           <Typography
             variant="small"
             color="blue-gray"
@@ -132,6 +132,7 @@ export default function VehicleUsagePercentageChart({ userId }) {
             This bar chart shows the percentage of days you reserved vehicles each month over the past year,
             indicating your vehicle usage relative to the total days available per month.
           </Typography>
+          </div>
         </>
       )}
     </Card>

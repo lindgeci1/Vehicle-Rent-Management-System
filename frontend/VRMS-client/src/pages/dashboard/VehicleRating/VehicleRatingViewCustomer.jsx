@@ -206,12 +206,13 @@ const VehicleRatingViewCustomer = ({
             </Typography>
           </Box>
 
-          <Divider />
+          <Box mt={1} mb={2} mx={2} borderBottom="1px solid #e0e0e0" />
+
 
           {/* Rating row with stars and value */}
-          <Box sx={{ px: 2, pt: 1 }}>
+          <Box sx={{ px: 2 }}>
             <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-              <StarIcon fontSize="small" color="warning" />
+
               <Typography variant="body2" fontWeight={600} minWidth={60}>
                 Rating:
               </Typography>
@@ -237,6 +238,7 @@ const VehicleRatingViewCustomer = ({
                 {r.reviewComment || 'No comment'}
               </Typography>
             </Stack>
+<Box mt={1} mb={2} mx={0} borderBottom="1px solid #e0e0e0" />
 
             {/* Add extra date info line if you want (e.g., updatedAt or rating date again) */}
             {/* <Stack direction="row" spacing={1} alignItems="center">
@@ -247,7 +249,6 @@ const VehicleRatingViewCustomer = ({
             </Stack> */}
           </Box>
 
-          <Divider sx={{ mx: 2, mt: 1 }} />
 
           {/* Actions */}
           <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>

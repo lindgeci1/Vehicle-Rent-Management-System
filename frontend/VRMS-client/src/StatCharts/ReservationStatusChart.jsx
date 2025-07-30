@@ -62,7 +62,7 @@ export default function VehicleTypePieChart({ userId, height = 260 }) {
         width={undefined}
         height={height}
       />
-      {/* Add some descriptive text */}
+      <div className="mt-1 border-t pt-1 flex justify-between items-center">
       <Typography
         variant="small"
         color="blue-gray"
@@ -71,6 +71,7 @@ export default function VehicleTypePieChart({ userId, height = 260 }) {
         This chart shows the distribution of your reservations by vehicle category,
         helping you see which types of vehicles you prefer to rent.
       </Typography>
+      </div>
     </Card>
   );
 }

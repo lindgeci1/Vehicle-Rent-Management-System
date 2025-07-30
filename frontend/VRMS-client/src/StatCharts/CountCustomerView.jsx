@@ -135,7 +135,7 @@ function CountCustomerView() {
           </div>
         ))}
       </div>
-
+<div className="mt-1 border-t pt-1 flex justify-center  items-center">
       <Typography
         variant="small"
         color="blue-gray"
@@ -144,6 +144,7 @@ function CountCustomerView() {
         This overview summarizes your personal reservations, payments, receipts,
         and vehicle ratings to help you track your activity easily.
       </Typography>
+      </div>
     </Card>
   );
 }

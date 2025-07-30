@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
 import { HeartIcon } from "@heroicons/react/24/solid";
@@ -6,38 +7,31 @@ export function Footer({ brandName, brandLink, routes }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="py-2">
-      <div className="flex w-full flex-wrap items-center justify-center gap-6 px-2 md:justify-between">
-        <ul className="flex items-center gap-4">
-          {routes.map(({ name, path }) => (
-            <li key={name}>
-              <Typography
-                as="a"
-                href={path}
-                target="_blank"
-                variant="small"
-                className="py-0.5 px-1 font-normal text-inherit transition-colors hover:text-blue-500"
-              >
-                {name}
-              </Typography>
-            </li>
-          ))}
-        </ul>
+    <footer className="w-full mt-6 border-t pt-4 text-blue-gray-600">
+      <div className="flex flex-wrap items-center justify-center md:justify-between gap-4 px-4">
+        <Typography variant="small" className="text-sm text-center md:text-left">
+          © {year}{" "}
+          <a
+            href={brandLink}
+            className="font-semibold text-blue-600 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {brandName}
+          </a>
+          . All rights reserved.
+        </Typography>
+
+      </div>
+
+      <div className="mt-4 text-center">
+        <Typography variant="small" className="italic text-xs text-blue-gray-400">
+          Drive confidently with our trusted rental system — optimized for convenience, speed, and safety.
+        </Typography>
       </div>
     </footer>
   );
 }
-
-Footer.defaultProps = {
-  // brandName: "Creative Tim",
-  // brandLink: "https://www.creative-tim.com",
-  routes: [
-    // { name: "Creative Tim", path: "https://www.creative-tim.com" },
-    // { name: "About Us", path: "https://www.creative-tim.com/presentation" },
-    // { name: "Blog", path: "https://www.creative-tim.com/blog" },
-    // { name: "License", path: "https://www.creative-tim.com/license" },
-  ],
-};
 
 Footer.propTypes = {
   brandName: PropTypes.string,
