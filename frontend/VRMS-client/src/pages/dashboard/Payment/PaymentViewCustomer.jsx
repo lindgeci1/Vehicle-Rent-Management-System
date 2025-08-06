@@ -25,7 +25,7 @@ import {
 import Cookies from 'js-cookie';
 import { decodeToken } from '../../../../decodeToken';
 import { api } from '@/apiClient';
-
+import { useNavigate } from 'react-router-dom';
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr);
@@ -57,7 +57,7 @@ const useCustomerUsernames = (payments) => {
 function PaymentViewCustomer({ payments, onPay }) {
   const theme = useTheme();
   const usernames = useCustomerUsernames(payments);
-
+const navigate = useNavigate();
   // reservationMap: reservationId → customerId
   const [reservationMap, setReservationMap] = useState({});
   // reservationVehicles: reservationId → { mark, model }
@@ -128,13 +128,25 @@ function PaymentViewCustomer({ payments, onPay }) {
   }, [groupedByReservation, reservationVehicles]);
 
   return (
-    <Box>
-      {/* Header */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={600}>
-          My Payment Records
-        </Typography>
-      </Stack>
+<Box className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-6">
+  <Box textAlign="center" mb={5}>
+    <Typography
+      variant="h4"
+      sx={{
+        fontWeight: 600,
+        color: '#0f172a',
+      }}
+    >
+      Your Records
+    </Typography>
+    <Typography
+      variant="body2"
+      className="text-blue-gray-500 italic px-2 mt-6"
+      textAlign="center"
+    >
+      Manage your payments securely and track all transactions related to your vehicle reservations in one place.
+    </Typography>
+  </Box>
 
       {/* Empty State */}
   {filteredPayments.length === 0 && (
@@ -190,106 +202,160 @@ function PaymentViewCustomer({ payments, onPay }) {
             <Grid container spacing={3}>
               {paymentsForRes.map((p) => (
                 <Grid item xs={12} md={6} key={p.paymentId}>
-                  <Card
-                    elevation={1}
-                    sx={{
-                      borderRadius: 2,
-                      transition: 'box-shadow 0.2s ease-in-out',
-                      '&:hover': {
-                        boxShadow: theme.shadows[4]
-                      }
-                    }}
-                  >
-                    {/* Card Header with Avatar */}
-                    <CardHeader
-                      avatar={
-                        <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-                          <PaymentIcon />
-                        </Avatar>
-                      }
-                      titleTypographyProps={{
-                        fontWeight: 600,
-                        fontSize: 16,
-                        fontFamily: 'Roboto, sans-serif'
-                      }}
-                      title={
-                        usernames[p.paymentId]
-                          ? `Reservation for ${usernames[p.paymentId]}`
-                          : 'Reservation for Customer'
-                      }
-                      subheader={formatDate(p.dateIssued)}
-                      subheaderTypographyProps={{
-                        color: theme.palette.text.secondary,
-                        fontSize: 12
-                      }}
-                      sx={{ px: 2, pt: 2 }}
-                    />
+<Card
+  elevation={1}
+  sx={{
+    borderRadius: 2,
+    transition: 'box-shadow 0.2s ease-in-out',
+    width: 580,
+    margin: 'auto',
+    boxShadow: 2,
+    bgcolor: 'background.paper',
+    overflow: 'hidden',
+    '&:hover': {
+      boxShadow: 4,
+    },
+  }}
+>
+  {/* Card Header */}
+  <CardHeader
+    avatar={
+      <Avatar sx={{ bgcolor: 'primary.main', width: 44, height: 44 }}>
+        <PaymentIcon fontSize="medium" />
+      </Avatar>
+    }
+    title={
+      <Typography variant="subtitle1" fontWeight={600}>
+        {usernames[p.paymentId] ? `Payment for ${usernames[p.paymentId]}` : 'Payment for Customer'}
+      </Typography>
+    }
+    subheader={
+      <Typography variant="caption" color="text.secondary">
+        Payment ID: {p.paymentId}
+      </Typography>
+    }
+    sx={{ pb: 1 }}
+  />
 
-                    <Divider />
+  <Divider sx={{ mx: 2 }} />
 
-                    {/* Card Content: Details */}
-                    <CardContent>
-                      <Stack spacing={1.5}>
-                        <InfoRow
-                          label="Description"
-                          value={p.description}
-                          icon={<DescriptionIcon fontSize="small" color="action" />}
-                        />
-                        <InfoRow
-                          label="Prepayment"
-                          value={`€${p.prepaymentAmount?.toFixed(2) ?? 'N/A'}`}
-                          icon={<EuroIcon fontSize="small" color="action" />}
-                        />
-                        <InfoRow
-                          label="Total Price"
-                          value={`€${p.totalPrice?.toFixed(2) ?? 'N/A'}`}
-                          icon={<EuroIcon fontSize="small" color="action" />}
-                        />
-                        <InfoRow
-                          label="Payment Date"
-                          value={formatDate(p.dateIssued)}
-                          icon={<CalendarIcon fontSize="small" color="action" />}
-                        />
-<InfoChipRow
-  label="Status"
-  value={p.paymentStatus}
-  successCondition={p.paymentStatus === 'pre-paid' || p.paymentStatus === 'paid'}
-  successIcon={<DoneAllIcon fontSize="small" />}
-  failIcon={<HourglassIcon fontSize="small" />}
-/>
+  {/* Card Content */}
+  <CardContent sx={{ px: 3, pb: 0 }}>
+    <Box
+      sx={{
+        backgroundColor: '#f5f7fa',
+        borderRadius: 2,
+        px: 3,
+        py: 2,
+        mb: 2,
+      }}
+    >
+      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+        Payment Details
+      </Typography>
+
+      {/* Row 1: Description & Prepayment */}
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <InfoRow label="Description" value={p.description} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <InfoRow label="Prepayment" value={`€${p.prepaymentAmount?.toFixed(2) ?? 'N/A'}`} />
+        </Grid>
+        {/* Row 2: Total Price & Issued Date */}
+        <Grid item xs={12} sm={6}>
+          <InfoRow label="Total Price" value={`€${p.totalPrice?.toFixed(2) ?? 'N/A'}`} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <InfoRow
+            label="Issued At"
+            value={formatDate(p.dateIssued)}
+            icon={<CalendarIcon fontSize="small" />}
+          />
+        </Grid>
+        {/* Row 3: Status */}
+        <Grid item xs={12}>
+          <InfoChipRow
+            label="Status"
+            value={p.paymentStatus}
+            successCondition={p.paymentStatus === 'pre-paid' || p.paymentStatus === 'paid'}
+            successIcon={<DoneAllIcon fontSize="small" />}
+            failIcon={<HourglassIcon fontSize="small" />}
+          />
+        </Grid>
+      </Grid>
+    </Box>
+  </CardContent>
+
+  <Divider sx={{ mx: 2 }} />
+
+  {/* Card Actions */}
+  <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+    <Button
+      variant="contained"
+      color="primary"
+      size="small"
+      startIcon={<PaymentIcon />}
+      disabled={
+        p.paymentStatus?.toLowerCase() === 'pre-paid' ||
+        p.stripeStatus === 'succeeded'
+      }
+      onClick={() => onPay(p)}
+      sx={{
+        textTransform: 'none',
+        boxShadow: 'none',
+        fontSize: 13,
+        '&:hover': {
+          boxShadow: 3,
+        },
+      }}
+    >
+      {p.paymentStatus?.toLowerCase() === 'pre-paid' ||
+      p.stripeStatus === 'succeeded'
+        ? 'Paid'
+        : 'Pay Now'}
+    </Button>
+<Button
+  variant="outlined"
+  color="secondary"
+  size="small"
+  startIcon={<DescriptionIcon />}
+  onClick={() => navigate('/dashboard/receipt', {
+    state: {
+      paymentId: p.paymentId || p.PaymentId,  // Use the correct case matching your object
+    }
+  })}
+  sx={{
+    textTransform: 'none',
+    fontSize: 13,
+    ml: 1,
+    pointerEvents:
+      p.paymentStatus?.toLowerCase() === 'paid' ||
+      p.paymentStatus?.toLowerCase() === 'pre-paid'
+        ? 'auto'
+        : 'none',
+    opacity:
+      p.paymentStatus?.toLowerCase() === 'paid' ||
+      p.paymentStatus?.toLowerCase() === 'pre-paid'
+        ? 1
+        : 0.5
+  }}
+  disabled={
+    !(
+      p.paymentStatus?.toLowerCase() === 'paid' ||
+      p.paymentStatus?.toLowerCase() === 'pre-paid'
+    )
+  }
+>
+  Go to Receipt
+</Button>
 
 
-                      </Stack>
-                    </CardContent>
 
-                    <Divider sx={{ mx: 2 }} />
+  </CardActions>
+</Card>
 
-                    {/* Card Actions */}
-                    <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<PaymentIcon />}
-                        disabled={
-                          p.paymentStatus?.toLowerCase() === 'pre-paid' ||
-                          p.stripeStatus === 'succeeded'
-                        }
-                        onClick={() => onPay(p)}
-                        sx={{
-                          textTransform: 'none',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            boxShadow: theme.shadows[2]
-                          }
-                        }}
-                      >
-                        {p.paymentStatus?.toLowerCase() === 'pre-paid' ||
-                        p.stripeStatus === 'succeeded'
-                          ? 'Paid'
-                          : 'Pay Now'}
-                      </Button>
-                    </CardActions>
-                  </Card>
+
                 </Grid>
               ))}
             </Grid>
@@ -301,18 +367,26 @@ function PaymentViewCustomer({ payments, onPay }) {
 }
 
 const InfoRow = ({ label, value, icon }) => (
-  <Stack direction="row" justifyContent="space-between" alignItems="center">
-    <Stack direction="row" spacing={1} alignItems="center">
-      {icon}
-      <Typography variant="body2" fontWeight={500} color="text.primary">
-        {label}:
-      </Typography>
-    </Stack>
-    <Typography variant="body2" color="text.secondary">
-      {value || 'N/A'}
+<Stack
+  direction="row"
+  alignItems="center"
+  spacing={1}
+  sx={{ width: '100%', justifyContent: 'flex-start' }}
+>
+  <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexShrink: 0, minWidth: 120 }}>
+    {icon}
+    <Typography variant="body2" fontWeight={500} color="text.primary" noWrap>
+      {label}:
     </Typography>
   </Stack>
+  <Typography variant="body2" color="text.secondary" sx={{ ml: 1, whiteSpace: 'nowrap' }}>
+    {value || 'N/A'}
+  </Typography>
+</Stack>
+
 );
+
+
 
 const InfoChipRow = ({
   label,
@@ -324,8 +398,13 @@ const InfoChipRow = ({
   const theme = useTheme();
   const isSuccess = !!successCondition;
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Typography variant="body2" fontWeight={500} color="text.primary">
+    <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={0}>
+      <Typography
+        variant="body2"
+        fontWeight={500}
+        color="text.primary"
+        sx={{ minWidth: 90 /* smaller minWidth for label */ }}
+      >
         {label}:
       </Typography>
       <Chip
@@ -334,6 +413,7 @@ const InfoChipRow = ({
         color={isSuccess ? 'success' : 'warning'}
         icon={isSuccess ? successIcon : failIcon}
         sx={{
+          ml: 4.5,  // small margin-left
           minWidth: 96,
           fontSize: 12,
           fontWeight: 500,
@@ -348,6 +428,7 @@ const InfoChipRow = ({
     </Stack>
   );
 };
+
 
 
 export default PaymentViewCustomer;

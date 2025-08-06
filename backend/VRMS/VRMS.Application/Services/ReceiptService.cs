@@ -73,5 +73,15 @@ namespace VRMS.Application.Services
             return mapper.Map<IEnumerable<ReceiptDto>>(receipts);
         }
 
+
+        public async Task<ReceiptDto?> GetReceiptByPaymentIdAsync(int paymentId)
+        {
+            var receipt = await receiptRepository.GetReceiptByPaymentIdAsync(paymentId);
+            if (receipt == null) return null;
+
+            return mapper.Map<ReceiptDto>(receipt);
+        }
+
+
     }
 }
