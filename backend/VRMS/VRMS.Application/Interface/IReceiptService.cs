@@ -12,5 +12,7 @@ namespace VRMS.Application.Interface
 
         Task<string?> GetCustomerUsernameByReceiptIdAsync(int receiptId);
         Task<IEnumerable<ReceiptDto>> GetReceiptsByCustomerIdAsync(int customerId);
+
+        Task<ReceiptDto?> GetReceiptByPaymentIdAsync(int paymentId);
     }
 }

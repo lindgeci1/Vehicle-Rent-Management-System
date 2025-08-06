@@ -15,5 +15,7 @@ namespace VRMS.Domain.Infra.Interfaces
         public Task<IEnumerable<Receipt>> GetAllReceiptsAsync();
 
         Task<IEnumerable<Receipt>> GetReceiptsByCustomerIdAsync(int customerId);
+
+        Task<Receipt?> GetReceiptByPaymentIdAsync(int paymentId);
     }
 }

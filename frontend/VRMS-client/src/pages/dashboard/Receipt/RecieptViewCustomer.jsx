@@ -13,6 +13,7 @@ import {
   Stack,
   useTheme
 } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import {
   Receipt as ReceiptIcon,
   Euro as EuroIcon,
@@ -22,6 +23,32 @@ import {
 import { api } from '@/apiClient';
 import Cookies from 'js-cookie';
 import { decodeToken } from '../../../../decodeToken';
+const glowBlinkKeyframes = `
+  @keyframes glowBlink {
+    0%, 100% {
+      border-color: transparent;
+      box-shadow: none;
+    }
+    50% {
+      border-color: #ff6b6b; /* light red */
+      box-shadow: 0 0 8px 3px #ff6b6b;
+    }
+  }
+`;
+
+
+function InjectGlobalStyles() {
+  useEffect(() => {
+    const styleTag = document.createElement('style');
+    styleTag.textContent = glowBlinkKeyframes;
+    document.head.appendChild(styleTag);
+    return () => {
+      document.head.removeChild(styleTag);
+    };
+  }, []);
+  return null;
+}
+
 
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A';
@@ -53,6 +80,11 @@ const useCustomerUsernames = (receipts) => {
 const ReceiptViewCustomer = ({ receipts }) => {
   const theme = useTheme();
   const usernames = useCustomerUsernames(receipts);
+const location = useLocation();
+const { paymentId, receiptId } = location.state || {};
+const [paymentReceipts, setPaymentReceipts] = useState([]);
+const [loading, setLoading] = useState(false);
+  const highlightedReceiptIds = paymentReceipts.map(r => r.receiptId);
 
   // reservationMap: reservationId → customerId
   const [reservationMap, setReservationMap] = useState({});
@@ -81,6 +113,24 @@ const ReceiptViewCustomer = ({ receipts }) => {
     };
     fetchReservations();
   }, []);
+useEffect(() => {
+  if (paymentId) {
+    setLoading(true);
+    api.get(`/Receipts/byPayment/${paymentId}`)
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          setPaymentReceipts(res.data);
+        } else if (res.data) {
+          setPaymentReceipts([res.data]);
+        } else {
+          setPaymentReceipts([]);
+        }
+      })
+      .catch(() => setPaymentReceipts([]))
+      .finally(() => setLoading(false));
+  }
+}, [paymentId]);
+
 
   // 2) Filter so a Customer sees only their own receipts
   const filteredReceipts =
@@ -200,10 +250,27 @@ const ReceiptViewCustomer = ({ receipts }) => {
   }, [groupedByReservation, reservationVehicles]);
 
   return (
-    <Box>
-      <Typography variant="h5" fontWeight={600} gutterBottom>
-        My Receipts
-      </Typography>
+    <>
+     <InjectGlobalStyles />
+<Box className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-gray-50 p-6">
+  <Box textAlign="center" mb={5}>
+    <Typography
+      variant="h4"
+      sx={{
+        fontWeight: 600,
+        color: '#0f172a',
+      }}
+    >
+      My Receipts
+    </Typography>
+    <Typography
+      variant="body2"
+      className="text-blue-gray-500 italic px-2 mt-6"
+      textAlign="center"
+    >
+      This section displays all your issued receipts linked to completed payments, grouped by vehicle reservations.
+    </Typography>
+  </Box>
 
       {/* Empty State */}
       {Object.keys(groupedByReservation).length === 0 && (
@@ -241,7 +308,7 @@ const ReceiptViewCustomer = ({ receipts }) => {
           </Box>
 
           <Typography variant="h6" fontWeight={600} gutterBottom>
-            No Receipts Available
+            No Receipts Found
           </Typography>
           <Typography variant="body2" color="text.secondary">
             You don’t have any receipts yet. Once a payment is completed and finalized, your receipt will appear here.
@@ -268,43 +335,84 @@ const ReceiptViewCustomer = ({ receipts }) => {
             <Grid container spacing={2}>
               {paymentsForRes.map((r) => (
                 <Grid item xs={12} md={6} key={r.receiptId}>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      borderRadius: 2,
-                      transition: 'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-2px)'
-                      }
-                    }}
-                  >
-                    <CardHeader
-                      avatar={
-                        <Avatar sx={{ bgcolor: 'primary.main' }}>
-                          <ReceiptIcon />
-                        </Avatar>
-                      }
-                      title={usernames[r.receiptId] ? `Receipt for ${usernames[r.receiptId]}` : 'Receipt for Customer'}
-                      titleTypographyProps={{ fontWeight: 600, fontSize: 16 }}
-                    />
+<Card
+  variant="outlined"
+  sx={{
+    cursor: 'default',
+    borderRadius: 2,
+    boxShadow: 2,
+    bgcolor: 'background.paper',
+    transition: 'all 0.3s ease',
+    overflow: 'hidden',
+    borderColor: 'transparent',  // default no border color
+    ...(highlightedReceiptIds.includes(r.receiptId) && {
+      animation: 'glowBlink 1.5s 3',  // 3 iterations, not infinite
+      animationTimingFunction: 'ease-in-out',
+    }),
+    '&:hover': {
+      boxShadow: 2,
+    },
+  }}
+>
 
-                    <Divider />
 
-                    <CardContent>
-                      <Stack spacing={1.5}>
-                        <InfoRow label="Receipt Type" value={r.receiptType} />
-                        <InfoRow
-                          label="Amount Paid"
-                          value={`€${r.amount?.toFixed(2)}`}
-                          icon={<EuroIcon fontSize="small" />}
-                        />
-                        <InfoRow
-                          label="Issued At"
-                          value={formatDate(r.issuedAt)}
-                          icon={<CalendarIcon fontSize="small" />}
-                        />
-                      </Stack>
-                    </CardContent>
+<CardHeader
+  avatar={
+    <Avatar sx={{ bgcolor: 'primary.main', width: 44, height: 44 }}>
+      <ReceiptIcon fontSize="medium" />
+    </Avatar>
+  }
+  title={
+    <Typography variant="subtitle1" fontWeight={600}>
+      {usernames[r.receiptId] ? `Receipt for ${usernames[r.receiptId]}` : 'Receipt for Customer'}
+    </Typography>
+  }
+  subheader={
+    <Typography variant="caption" color="text.secondary">
+      Receipt ID: {r.receiptId}
+    </Typography>
+  }
+  sx={{ pb: 1.5 }}
+/>
+
+<Divider sx={{ mx: 2 }} />
+
+<CardContent sx={{ px: 3, pb: 0 }}>
+  <Box
+    sx={{
+      backgroundColor: '#f5f7fa',
+      borderRadius: 2,
+      px: 3,
+      py: 2,
+      mb: 2,
+    }}
+  >
+    <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+      Receipt Details
+    </Typography>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <InfoRow label="Receipt Type" value={r.receiptType} />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <InfoRow
+          label="Amount Paid"
+          value={`€${r.amount?.toFixed(2)}`}
+          icon={<EuroIcon fontSize="small" />}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <InfoRow
+          label="Issued At"
+          value={formatDate(r.issuedAt)}
+          icon={<CalendarIcon fontSize="small" />}
+        />
+      </Grid>
+    </Grid>
+  </Box>
+</CardContent>
+
+
 
                     <Divider sx={{ mx: 2 }} />
 
@@ -326,19 +434,24 @@ const ReceiptViewCustomer = ({ receipts }) => {
         );
       })}
     </Box>
+    </>
   );
 };
 
+
 const InfoRow = ({ label, value, icon }) => (
-  <Stack direction="row" justifyContent="space-between" alignItems="center">
+  <Stack direction="row" alignItems="center" justifyContent="space-between">
     <Stack direction="row" spacing={1} alignItems="center">
       {icon}
-      <Typography variant="body2" fontWeight={500}>
+      <Typography variant="body2" color="text.secondary" fontWeight={500}>
         {label}:
       </Typography>
     </Stack>
-    <Typography variant="body2">{value ?? 'N/A'}</Typography>
+    <Typography variant="body2" fontWeight={500} color="text.primary">
+      {value ?? 'N/A'}
+    </Typography>
   </Stack>
 );
+
 
 export default ReceiptViewCustomer;

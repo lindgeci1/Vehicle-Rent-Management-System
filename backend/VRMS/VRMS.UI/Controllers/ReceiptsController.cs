@@ -98,5 +98,15 @@ namespace VRMS.UI.Controllers
             }
         }
 
+        [HttpGet("byPayment/{paymentId}")]
+        public async Task<IActionResult> GetReceiptByPaymentId(int paymentId)
+        {
+            var receipt = await receiptService.GetReceiptByPaymentIdAsync(paymentId);
+            if (receipt == null)
+                return NotFound();
+
+            return Ok(receipt);
+        }
+
     }
 }

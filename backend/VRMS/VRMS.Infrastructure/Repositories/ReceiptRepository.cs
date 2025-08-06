@@ -19,6 +19,11 @@ namespace VRMS.Infrastructure.Repositories
 
             return true;
         }
+        public async Task<Receipt?> GetReceiptByPaymentIdAsync(int paymentId)
+        {
+            return await vRMSDbContext.Receipts
+                .FirstOrDefaultAsync(r => r.PaymentId == paymentId);
+        }
 
         public async Task<Receipt> GetReceiptByIdAsync(int id) =>
             await vRMSDbContext.Receipts.FirstOrDefaultAsync(x => x.ReceiptId == id);
